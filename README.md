@@ -1,5 +1,6 @@
 <h1>Python Projects</h1>
 <ul>
+    <li><a href="https://github.com/jungheeyu/python-projects/blob/main/snake_game/README.md">Snake Game</a></li>
     <li><a href="https://github.com/jungheeyu/python-projects/blob/main/quiz-game/README.md">Quiz Game</a></li>
     <li><a href="https://github.com/jungheeyu/python-projects/blob/main/blackjack/README.md">Black Jack</a></li>
     <li><a href="https://github.com/jungheeyu/python-projects/blob/main/hangman/README.md">Hangman</a></li>

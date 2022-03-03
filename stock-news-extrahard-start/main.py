@@ -1,12 +1,20 @@
 import requests
+from twilio.rest import Client
 
 STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
+NUM_DAYS = 7
+
+# API keys
 ALPHA_VANTAGE_API_KEY = "VZRH7X9ZESYF9PFN"
 NEWS_API_KEY = "3dc2973b61764b798f5169c2a94db50e"
 
-# Set up parameters for requests
-# - For Alpha Vantage
+# Set up for using Twilio
+account_sid = 'ACedb1e46cd112da2013a9e0545d599efc'
+auth_token = '800e75da517127180a0da3ddb39b35a8'
+client = Client(account_sid, auth_token)
+
+# Set up parameters for Alpha Vantage requests
 url_alpha_vantage = 'https://www.alphavantage.co/query'
 params_alpha_vantage = {
     "function": "TIME_SERIES_DAILY",
@@ -14,7 +22,7 @@ params_alpha_vantage = {
     "apikey": ALPHA_VANTAGE_API_KEY
 }
 
-# - For News
+# Set up parameters for News requests
 url_news = "https://newsapi.org/v2/everything"
 params_news = {
     "q": STOCK,
@@ -33,14 +41,15 @@ dates = sorted(daily_data.keys(), reverse=True)
 
 # Iterate through daily price data
 # Find if there is price increase/decrease more than 5%
-for i in range(1, 15):
-    day_before_yesterday = dates[i-1]
-    yesterday = dates[i]
-    day_before_yesterday_price = float(daily_data[day_before_yesterday]['4. close'])
+for i in range(1, NUM_DAYS):
+    yesterday = dates[i-1]
+    today = dates[i]
     yesterday_price = float(daily_data[yesterday]['4. close'])
+    today_price = float(daily_data[today]['4. close'])
+    percentage_change = (yesterday_price - today_price) / yesterday_price * 100
 
     # Get news from News API if price difference is more than 5%
-    if yesterday_price < day_before_yesterday_price * 0.95 or yesterday_price > day_before_yesterday_price * 1.05:
+    if percentage_change > 5 or percentage_change < -5:
 
         # Get response for News API
         params_news["from"] = yesterday
@@ -48,24 +57,16 @@ for i in range(1, 15):
         response_news.raise_for_status()
         data_news = response_news.json()
 
-        # Get 3 news articles about the STOCK
+        # Get 3 news articles about the STOCK and send SMS
         for k in range(3):
-            print(yesterday, data_news['articles'][k]['title'])
-            print(data_news['articles'][k]['description'])
+            headline = data_news['articles'][k]['title']
+            brief = data_news['articles'][k]['description']
+            imoji = "🔺" if percentage_change > 5 else "🔻"
 
-
-## STEP 3: Use https://www.twilio.com
-# Send a seperate message with the percentage change and each article's title and description to your phone number. 
-
-
-#Optional: Format the SMS message like this: 
-"""
-TSLA: 🔺2%
-Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
-Brief: We at Insider Monkey have gone over 821 13F filings that hedge funds and prominent investors are required to file by the SEC The 13F filings show the funds' and investors' portfolio positions as of March 31st, near the height of the coronavirus market crash.
-or
-"TSLA: 🔻5%
-Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
-Brief: We at Insider Monkey have gone over 821 13F filings that hedge funds and prominent investors are required to file by the SEC The 13F filings show the funds' and investors' portfolio positions as of March 31st, near the height of the coronavirus market crash.
-"""
-
+            # Create message and send SMS
+            message = client.messages.create(
+                body=f"\n{STOCK}: {imoji+str(round(percentage_change, 2))}%  "
+                     f"\n Headline: {headline} \n Brief: {brief}",
+                from_='+18623058420',
+                to = '15302048374'
+            )

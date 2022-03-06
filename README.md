@@ -1,5 +1,6 @@
 <h1>Python Projects</h1>
 <ul>
+    <li><h2><a href="https://github.com/jungheeyu/python-projects/tree/main/ants_vs_somebees">Ants vs Somebees</a></h2></li>
     <li><h2><a href="https://github.com/jungheeyu/python-projects/tree/main/stock-news-extrahard-start">Stock News App</a></h2></li>
     <li><h2><a href="https://github.com/jungheeyu/python-projects/tree/main/quizzler_app">Quizzler App</a></h2></li>
     <li><h2><a href="https://github.com/jungheeyu/python-projects/tree/main/us-states-game">Guess 50 States</a></h2></li>
